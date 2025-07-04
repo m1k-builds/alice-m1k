@@ -112,7 +112,7 @@ jobs:
       with:
         target_commitish: ${{ github.ref_name }}
         files: Alice*.AppImage
-        name: Alice for M1K from ${{ github.ref_name }}
+        name: Alice for M1K from ${{ github.github.sha }}
         tag_name: ${{ github.run_id }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
