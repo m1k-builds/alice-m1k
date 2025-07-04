@@ -105,6 +105,7 @@ jobs:
 
           # List the generated AppImage
           ls -l Alice*.AppImage
+          chmod +x Alice*.AppImage
 
           # Test it out
           timeout -k 10s 120s ./Alice*.AppImage || true
@@ -115,7 +116,7 @@ jobs:
       with:
         target_commitish: ${{ github.ref_name }}
         files: Alice*.AppImage
-        name: Alice for M1K from ${{ github.github.sha }}
+        name: Alice for M1K
         tag_name: ${{ github.run_id }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
