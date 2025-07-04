@@ -30,6 +30,10 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
+        sudo apt-get install -y dos2unix cmake || true
+        sudo apt-get install -y libudev-dev libusb-1.0-0-dev libboost-all-dev || true
+
+        pip install numpy
         
     - name: Clone and build libsmu (Linux)
       if: runner.os == 'Linux'
@@ -37,7 +41,7 @@ jobs:
         git clone https://github.com/sounddrill31/libsmu.git
         cd libsmu
         mkdir build && cd build
-        cmake -DBUILD_PYTHON=OFF -DCMAKE_INSTALL_PREFIX=/usr/ ..
+        cmake -DCMAKE_INSTALL_PREFIX=/usr/ ..
         make
         sudo make install
         cd ../..
