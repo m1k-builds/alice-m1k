@@ -1,0 +1,103 @@
+name: Linux CI
+
+on:
+  push:
+    branches:
+      - M1K-Version-1.3
+  workflow_dispatch:
+ # pull_request:
+ #   branches:
+ #     - M1K-Version-1.3
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04,ubuntu-24.04-arm] #[ubuntu-20.04, macos-latest, windows-latest]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13' 
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        
+    - name: Clone and build libsmu (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        git clone https://github.com/sounddrill31/libsmu.git
+        cd libsmu
+        mkdir build && cd build
+        cmake -DBUILD_PYTHON=OFF -DCMAKE_INSTALL_PREFIX=/usr/ ..
+        make
+        sudo make install
+        cd ../..
+
+    - name: Use PyInstaller to package Alice (Linux)
+      run: |
+        cp launcher/alice.py alice.py || true
+        pyinstaller alice.spec # Might output to dist/alice
+        
+        tree dist
+
+    - name: Create Package with Dependencies (Linux)
+      if: false # Disable till we know files
+      if: runner.os == 'Linux'
+      run: |
+          export ARCH="$(uname -m)"
+          export VERSION="$(echo "$GITHUB_SHA" | cut -c 1-9)"
+          export APP=Alice
+
+          # Copy libsmu library
+          cp /usr/lib/$ARCH-linux-gnu/libsmu.so* ./dist/libs || echo "Copying libsmu failed"
+
+          # Copy Starter Script
+          cp launcher/AppRun ./dist || true
+
+          # Copy key system libraries that might not be auto-detected
+          # Note: Be selective and only include necessary libraries
+          cp /usr/lib/$ARCH-linux-gnu/libusb-1.0.so* ./dist/libs || echo "Copying libusb failed"
+
+          ( export ARCH="$(uname -m)" # Just to be double sure
+            cd dist
+            curl -w "(DL) <== %{url}\n" -qfSL "https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$(uname -m)-aio" -o "/usr/local/bin/sharun"
+            chmod -v "a+x" "/usr/local/bin/sharun"
+            command -v sharun &>/dev/null || echo -e "\n[X] FATAL: sharun is NOT Installed\n$(exit 1)" 
+            
+            ./sharun lib4bin \
+                --gen-lib-path \
+                --strace-mode \
+                --with-hooks \
+                --with-wrappe \
+                --wrappe-clvl 22 \
+                --wrappe-exec AppRun \
+                --dst-dir ./SHARUN_WRAPPED \
+                ./alice ./*.so*
+
+            tree ./SHARUN_WRAPPED
+
+            mv ./SHARUN_WRAPPED/alice ../"$APP"-"$VERSION"-anylinux-"$ARCH"
+          )
+
+          # List the generated Package
+          ls -l Alice-"$VERSION"-anylinux-"$ARCH"
+
+    - name: Upload Release Asset (Linux/Wrappe)
+      if: runner.os == 'linux'
+      uses: softprops/action-gh-release@v1
+      with:
+        target_commitish: ${{ github.ref_name }}
+        files: Alice*anylinux*
+        name: Alice for M1K from ${{ github.ref_name }}
+        tag_name: ${{ github.run_id }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
