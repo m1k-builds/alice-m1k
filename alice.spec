@@ -1,26 +1,15 @@
-# alice.spec
+# alice.spec, alice.py to be copied from launcher/alice.py
 # Run: pyinstaller alice.spec
 
 block_cipher = None
 
-def extra_datas(mydir):
-    exclude_dirs = {'.git', '__pycache__', '.idea', '.vscode'}
-    files = []
-    for root, dirs, filenames in os.walk(mydir):
-        dirs[:] = [d for d in dirs if d not in exclude_dirs]
-        for f in filenames:
-            if f.endswith(('.pyc', '.pyo')):  # Example: skip compiled files if not needed
-                continue
-            files.append((os.path.join(root, f), os.path.relpath(os.path.join(root, f), mydir)))
-    return files
-
-# Pretty much pick up all files available, alice is to be carried over from launcher folder at build time
 a = Analysis(
     ['alice.py'],
     pathex=['.'],
     binaries=[],
     datas=[
-        *extra_datas('.')
+        Tree('alice', prefix='alice'),
+        ('LICENSE_ADIBSD', '.')
     ],
     hiddenimports=[],
     hookspath=[],
