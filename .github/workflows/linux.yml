@@ -72,7 +72,7 @@ jobs:
           ln -s ./libsmu.so.1.0.4 AppDir/shared/lib/libsmu.so
 
           # Copy runner script
-          cp AppRun AppDir/AppRun
+          cp launcher/AppRun AppDir/AppRun
           chmod +x AppDir/AppRun
           dos2unix AppDir/AppRun # just in case
 
