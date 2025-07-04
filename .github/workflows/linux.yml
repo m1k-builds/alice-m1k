@@ -50,8 +50,7 @@ jobs:
         tree dist
 
     - name: Create Package with Dependencies (Linux)
-      if: false # Disable till we know files
-      if: runner.os == 'Linux'
+      if: false # Disable till we know files : runner.os == 'Linux'
       run: |
           export ARCH="$(uname -m)"
           export VERSION="$(echo "$GITHUB_SHA" | cut -c 1-9)"
