@@ -60,46 +60,58 @@ jobs:
           export VERSION="$(echo "$GITHUB_SHA" | cut -c 1-9)"
           export APP=Alice
 
-          # Copy libsmu library
-          cp /usr/lib/$ARCH-linux-gnu/libsmu.so* ./dist/libs || echo "Copying libsmu failed"
+          # Prepare AppDir structure
+          mkdir -p AppDir/shared/lib
+          mkdir -p AppDir/usr/share/applications
+          mkdir -p AppDir/usr/share/Alice-M1K/
+          ln -s ./usr/share ./AppDir/share
 
-          # Copy Starter Script
-          cp launcher/AppRun ./dist || true
+          # Copy libsmu library
+          cp /usr/lib/$ARCH-linux-gnu/libsmu.so.1.0.4  AppDir/shared/lib
+          ln -s ./libsmu.so.1.0.4 AppDir/shared/lib/libsmu.so.1
+          ln -s ./libsmu.so.1.0.4 AppDir/shared/lib/libsmu.so
+
+          # Copy runner script
+          cp AppRun AppDir/AppRun
+          chmod +x AppDir/AppRun
+          dos2unix AppDir/AppRun # just in case
 
           # Copy key system libraries that might not be auto-detected
           # Note: Be selective and only include necessary libraries
-          cp /usr/lib/$ARCH-linux-gnu/libusb-1.0.so* ./dist/libs || echo "Copying libusb failed"
+          cp /usr/lib/$ARCH-linux-gnu/libudev.so.1     AppDir/shared/lib/
+          cp /usr/lib/$ARCH-linux-gnu/libusb-1.0.so.0  AppDir/shared/lib/
+
+          mv dist/alice/* AppDir/usr/share/Alice-M1K/
 
           ( export ARCH="$(uname -m)" # Just to be double sure
-            cd dist
-            curl -w "(DL) <== %{url}\n" -qfSL "https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$(uname -m)-aio" -o "/usr/local/bin/sharun"
-            chmod -v "a+x" "/usr/local/bin/sharun"
-            command -v sharun &>/dev/null || echo -e "\n[X] FATAL: sharun is NOT Installed\n$(exit 1)" 
-            
-            ./sharun lib4bin \
-                --gen-lib-path \
-                --strace-mode \
-                --with-hooks \
-                --with-wrappe \
-                --wrappe-clvl 22 \
-                --wrappe-exec AppRun \
-                --dst-dir ./SHARUN_WRAPPED \
-                ./alice ./*.so*
+            cd AppDir
+            wget "https://raw.githubusercontent.com/VHSgunzo/sharun/refs/heads/main/lib4bin" -O ./lib4bin
+            chmod +x ./lib4bin
+            xvfb-run -a -- ./lib4bin -p -v -e -k -w \
+              usr/share/Alice-M1K/alice
 
-            tree ./SHARUN_WRAPPED
-
-            mv ./SHARUN_WRAPPED/alice ../"$APP"-"$VERSION"-anylinux-"$ARCH"
+            # ln ./sharun ./AppRun 
+            ./sharun -g
           )
 
-          # List the generated Package
-          ls -l Alice-"$VERSION"-anylinux-"$ARCH"
+          wget "https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-$ARCH" -O uruntime
+          chmod +x ./uruntime
+          ./uruntime --appimage-mkdwarfs -f \
+          	--set-owner 0 --set-group 0 \
+          	--no-history --no-create-timestamp \
+          	--compression zstd:level=22 -S26 -B32 \
+          	--header uruntime \
+          	-i ./AppDir -o "$APP"-"$VERSION"-anylinux-"$ARCH".AppImage
+
+          # List the generated AppImage
+          ls -l Alice*.AppImage
 
     - name: Upload Release Asset (Linux/Wrappe)
       if: runner.os == 'linux'
       uses: softprops/action-gh-release@v1
       with:
         target_commitish: ${{ github.ref_name }}
-        files: Alice*anylinux*
+        files: Alice*.AppImage
         name: Alice for M1K from ${{ github.ref_name }}
         tag_name: ${{ github.run_id }}
       env:
