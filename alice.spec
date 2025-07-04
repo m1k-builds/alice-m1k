@@ -8,8 +8,8 @@ a = Analysis(
     pathex=['.'],
     binaries=[],
     datas=[
-        Tree('alice', prefix='alice'),
-        ('LICENSE_ADIBSD', '.')
+        ('alice/*', 'alice'),
+        ('LICENSE_ADIBSD', '.'),
     ],
     hiddenimports=[],
     hookspath=[],
