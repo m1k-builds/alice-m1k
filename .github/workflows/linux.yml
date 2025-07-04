@@ -106,6 +106,9 @@ jobs:
           # List the generated AppImage
           ls -l Alice*.AppImage
 
+          # Test it out
+          timeout -k 10s 120s ./Alice*.AppImage || true
+
     - name: Upload Release Asset (Linux/Wrappe)
       if: runner.os == 'linux'
       uses: softprops/action-gh-release@v1
