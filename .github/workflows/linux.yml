@@ -111,7 +111,7 @@ jobs:
       if: runner.os == 'linux'
       continue-on-error: true
       run: |
-          timeout -k 10s 120s stdbuf -oL ./Alice*.AppImage || echo "Tried to run Alice"
+          timeout 120s stdbuf -oL ./Alice*.AppImage || echo "Tried to run Alice"
 
     - name: Upload Release Asset (Linux/Wrappe)
       if: runner.os == 'linux'
