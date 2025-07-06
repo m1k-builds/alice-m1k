@@ -107,8 +107,11 @@ jobs:
           ls -l Alice*.AppImage
           chmod +x Alice*.AppImage
 
-          # Test it out
-          timeout -k 10s 120s ./Alice*.AppImage || true
+    - name: Test AppImage
+      if: runner.os == 'linux'
+      continue-on-error: true
+      run: |
+          timeout -k 10s 120s stdbuf -oL ./Alice*.AppImage || echo "Tried to run Alice"
 
     - name: Upload Release Asset (Linux/Wrappe)
       if: runner.os == 'linux'
