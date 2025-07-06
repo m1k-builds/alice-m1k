@@ -30,10 +30,10 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y dos2unix cmake || true
+        sudo apt-get install -y dos2unix cmake xvfb || true
         sudo apt-get install -y libudev-dev libusb-1.0-0-dev libboost-all-dev || true
 
-        pip install numpy build setuptools pyinstaller tk
+        pip install numpy build setuptools pyinstaller tk cython
         
     - name: Clone and build libsmu (Linux)
       if: runner.os == 'Linux'
