@@ -37,4 +37,4 @@ if [ "$1" = '--getudev' ]; then
 fi
 
 # Continue with application execution
-exec "$CURRENTDIR"/bin/alice "$@"
+exec "$CURRENTDIR"/Alice-M1K/alice "$@"

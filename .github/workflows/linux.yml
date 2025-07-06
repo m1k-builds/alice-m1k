@@ -81,14 +81,14 @@ jobs:
           cp /usr/lib/$ARCH-linux-gnu/libudev.so.1     AppDir/shared/lib/
           cp /usr/lib/$ARCH-linux-gnu/libusb-1.0.so.0  AppDir/shared/lib/
 
-          mv dist/alice/* AppDir/usr/share/Alice-M1K/
+          mv dist/alice/* Alice-M1K/
 
           ( export ARCH="$(uname -m)" # Just to be double sure
             cd AppDir
             wget "https://raw.githubusercontent.com/VHSgunzo/sharun/refs/heads/main/lib4bin" -O ./lib4bin
             chmod +x ./lib4bin
             xvfb-run -a -- ./lib4bin --hard-links -v --strace-mode --with-hooks --with-sharun --with-python \
-              usr/share/Alice-M1K/alice
+              Alice-M1K/alice
 
             # ln ./sharun ./AppRun 
             ./sharun -g
