@@ -87,7 +87,7 @@ jobs:
             cd AppDir
             wget "https://raw.githubusercontent.com/VHSgunzo/sharun/refs/heads/main/lib4bin" -O ./lib4bin
             chmod +x ./lib4bin
-            xvfb-run -a -- ./lib4bin -p -v -e -k -w \
+            xvfb-run -a -- ./lib4bin --hard-links -v --strace-mode --with-hooks --with-sharun --with-python \
               usr/share/Alice-M1K/alice
 
             # ln ./sharun ./AppRun 
