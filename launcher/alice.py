@@ -28,6 +28,15 @@ def main():
         app_key = "desktop"
         app_args = []
 
+    # If 'list' is provided, show available tools and exit
+    if app_key.lower() == "list":
+        print("Available tools:")
+        for key, filename in APP_MAP.items():
+            file_path = os.path.join(os.getcwd(), filename)
+            found = " (found)" if os.path.isfile(file_path) else ""
+            print(f"  {key}: {filename}{found}")
+        sys.exit(0)
+
     # Default to alice-desktop if unknown or no argument
     script_name = APP_MAP.get(app_key, "alice-desktop-1.3.pyw")
 
