@@ -64,7 +64,6 @@ jobs:
           mkdir -p AppDir/shared/lib
           mkdir -p AppDir/Alice-M1K
           mkdir -p AppDir/usr/share/applications
-          mkdir -p AppDir/usr/share/Alice-M1K/
           ln -s ./usr/share ./AppDir/share
 
           # Copy libsmu library
@@ -82,7 +81,7 @@ jobs:
           cp /usr/lib/$ARCH-linux-gnu/libudev.so.1     AppDir/shared/lib/
           cp /usr/lib/$ARCH-linux-gnu/libusb-1.0.so.0  AppDir/shared/lib/
 
-          mv dist/alice/* Alice-M1K/
+          mv dist/alice/* AppDir/Alice-M1K/
 
           ( export ARCH="$(uname -m)" # Just to be double sure
             cd AppDir
