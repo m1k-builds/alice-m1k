@@ -31,8 +31,11 @@ def main():
     # Default to alice-desktop if unknown or no argument
     script_name = APP_MAP.get(app_key, "alice-desktop-1.3.pyw")
 
-    script_path = os.path.join(os.path.dirname(__file__), "..", script_name)
-    script_path = os.path.abspath(script_path)
+    # Use sys._MEIPASS if running as a PyInstaller bundle
+    if hasattr(sys, '_MEIPASS'):
+        script_path = os.path.join(sys._MEIPASS, script_name)
+    else:
+        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), script_name))
 
     # Launch the target script with remaining args
     # Use sys.executable to ensure correct interpreter

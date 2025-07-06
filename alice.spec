@@ -10,6 +10,12 @@ a = Analysis(
     datas=[
         ('alice/*', 'alice'),
         ('LICENSE_ADIBSD', '.'),
+        ('alice-desktop-1.3.pyw', '.'),
+        ('ohm-meter-vdiv-1.3.pyw', '.'),
+        ('dc-meter-source-tool-1.3.pyw', '.'),
+        ('strip-chart-tool-1.3.pyw', '.'),
+        ('data-logger-tool-1.3.pyw', '.'),
+        ('volt-meter-tool-1.3.pyw', '.'),
     ],
     hiddenimports=[],
     hookspath=[],
